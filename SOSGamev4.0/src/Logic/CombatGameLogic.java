@@ -16,7 +16,7 @@ public class CombatGameLogic extends GameLogic {
 	@Override
 	public void isScore(CheckScore check, int sOro)
 	{
-		Sounds sound = new Sounds();
+		Sounds sound = new Sounds(turn);
 		sound.playSound();	
 	
 		ArrayList<int[]> newAdditions = check.getSpots();

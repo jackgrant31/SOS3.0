@@ -1,4 +1,7 @@
 package GUI;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class InitGUI extends Application {
+	private DataOutputStream toServer;
 	
 	public static void main(String[] args)
 	{
@@ -82,11 +86,31 @@ public class InitGUI extends Application {
 		initpane.setAlignment(Pos.CENTER);
 		initpane.setVgap(10);
 		Scene initialScene = new Scene(initpane, 500, 600);
-		window.setScene(initialScene);
+		window.setScene(initialScene);	
 		
 		endButton.setOnAction(e -> {
-			end.initButton(window, player1entry.getText(), player2entry.getText(), (String) gridCombo.getValue(), (String) modeCombo.getValue());
+			try {
+				int modenum;
+				if (modeCombo.getValue().equals("Normal"))
+					modenum=0;
+				else if(modeCombo.getValue().equals("Extreme"))
+					modenum=1;
+				else
+					modenum=2;
+				int length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0)));
+				if(length==1)
+					length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0))+String.valueOf(gridCombo.getValue().charAt(1)));
+				toServer.writeInt(modenum);
+				toServer.writeInt(length);
+				window.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		});
 		window.show();
+	}
+
+	public void setOutput(DataOutputStream toServer2) {
+		toServer = toServer2;
 	}
 }

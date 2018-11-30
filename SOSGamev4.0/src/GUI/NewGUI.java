@@ -3,15 +3,12 @@ package GUI;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import GUI.SOSClient.Cell;
 import Logic.CombatGameLogic;
 import Logic.ExtremeGameLogic;
 import Logic.GameLogic;
+import Logic.NormalGameLogic;
 import Logic.Timer1;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -33,9 +30,10 @@ import javafx.stage.Stage;
 
 public class NewGUI extends Application{
 	
-	public static void main(String[] args)
+	public NewGUI(int mode, int size)
 	{
-		launch(args);
+		mode1 =mode;
+		length = size;
 	}
 	
 	@Override
@@ -83,14 +81,14 @@ public class NewGUI extends Application{
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(timerLabel, table);
-        game = new CombatGameLogic(length, player1, player2);
 
-//        if(mode==0)
-//        		game = new GameLogic(length, player1, player2);
-//        else if(mode==1)
-//    			game = new ExtremeGameLogic(length, player1, player2);
-//        else
-//    			game = new CombatGameLogic(length, player1, player2);
+        if(mode1==0)
+        		game = new NormalGameLogic(length, player1, player2);
+        else if(mode1==1)
+    			game = new ExtremeGameLogic(length, player1, player2);
+        else
+    			game = new CombatGameLogic(length, player1, player2);
+        
 		playerLabel.setText(" "+ player1+" points: 0  "+ player2+" points: 0");
 		int turn = game.getTurn();
 		if(turn==0)
@@ -110,9 +108,7 @@ public class NewGUI extends Application{
 		for(int i=0;i<labels.length;i++)
 			labels[i]=new Label();
 		
-		
-		Timer1 time = new Timer1(timerLabel, game, length);
-		//Cell cellClass = new Cell(game, player1, player2, length, sOro,labels,turnLabel,playerLabel, gtable, timerLabel, time);
+		cell = new Cell[length][length];
 		for (int row = 0; row < length; row++)
 			for (int col = 0; col < length; col++) 
 				gamegridPane.add(cell[row][col] = new Cell(row,col), row, col);
@@ -124,8 +120,8 @@ public class NewGUI extends Application{
 	}
 	
 	private Label turnLabel = new Label();	
-	private String letter1 = "S", letter2 = "O", player1="me", player2="you";
-	private int length=3, mode;
+	private String letter1 = "S", letter2 = "O", player1="Player1", player2="Player2";
+	private int length, mode1;
 	private Label playerLabel =  new Label();
 	private Label timerLabel;
 	private Stage window;
@@ -137,7 +133,6 @@ public class NewGUI extends Application{
 	private DataOutputStream toServer;
 	private boolean continueToPlay = true;
 	private boolean waiting = true;
-	private String host = "localhost";
 	private int player;
 	private String token = " ";
 	private Timer1 time;
@@ -146,79 +141,58 @@ public class NewGUI extends Application{
 	private Label lblStatus = new Label();
 	private int rowSelected;
 	private int columnSelected;
-	private Cell[][] cell = new Cell[3][3];
+	private Cell[][] cell;
 	
 	
 	private void connectToServer() {
-		try 
-		{
-			System.out.println(InetAddress.getLocalHost());
-			Socket socket = new Socket("10.33.70.71", 4969);
-			
-			fromServer = new DataInputStream(socket.getInputStream());
-			
-			toServer = new DataOutputStream(socket.getOutputStream());
-		} 
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
 		
 		new Thread(() -> { 
 			try {
-		      // Get notification from the server
-				player = fromServer.readInt();
-		      // Am I player 1 or 2?
+				//player = fromServer.readInt();
 				if (player == 1) {  
 					Platform.runLater(() -> {
 						playerLabel.setTextFill(Color.web("#0076a3"));
 						turnLabel.setText("Waiting for player 2 to join");
 					});
-					
-		        // Receive startup notification from the server
-					fromServer.readInt(); // Whatever read is ignored
-		        // The other player has joined
+					//fromServer.readInt();
 					Platform.runLater(() -> turnLabel.setText("Player 2 has joined. I start first"));
-		        // It is my turn
-		        myTurn = true; 
-		}
-		else if (player == 2) { 
-			Platform.runLater(() -> {
-				playerLabel.setTextFill(Color.web("#FF0000"));
-				turnLabel.setText("Waiting for player 1 to move"); 
-				});
-			player=0;
-			}	
-		while (continueToPlay) { 
-			System.out.println(game.getTurn()+" "+player);
-			if (game.getTurn()!=player) {
-				waitForPlayerAction(); // Wait for player 1 to move 
-				sendMove(); // Send the move to the server 
-//				receiveInfoFromServer(); // Receive info from the server
+					myTurn = true; 
+				}
+				else if (player == 2) { 
+					Platform.runLater(() -> {
+						playerLabel.setTextFill(Color.web("#FF0000"));
+						turnLabel.setText("Waiting for player 1 to move"); 
+					});
+					player=0;
+				}	
+				while (continueToPlay) { 
+					System.out.println(game.getTurn()+" "+player);
+					if (game.getTurn()!=player) {
+						waitForPlayerAction();
+						sendMove();
+					}
+					else if (game.getTurn()==player) {
+						receiveInfoFromServer(); 
+					} 
+				}
 			}
-			else if (game.getTurn()==player) {
-				receiveInfoFromServer(); // Receive info from the server 
-//				waitForPlayerAction(); // Wait for player 2 to move 
-//				sendMove(); // Send player 2's move to the server
-			} 
-		}
-		}
-		catch (Exception ex) {
-		      ex.printStackTrace();
-		    }
-		  }).start();
-		}
-		/** Wait for the player to mark a cell */
-		private void waitForPlayerAction() throws InterruptedException { 
-			while (waiting) {
-				Thread.sleep(200); 
+			catch (Exception ex) {
+				ex.printStackTrace();
 			}
+		}).start();
+	}
+		
+	private void waitForPlayerAction() throws InterruptedException { 
+		while (waiting) {
+			Thread.sleep(300); 
+		}
 		waiting=true;
 	}
 		
 	private void sendMove() throws IOException { 
 		System.out.println("Sent");
-		toServer.writeInt(rowSelected); // Send the selected row 
-		toServer.writeInt(columnSelected); // Send the selected column
+		toServer.writeInt(rowSelected); 
+		toServer.writeInt(columnSelected); 
 		toServer.writeChar( sOro.getValue().charAt(0));
 		int[] score = game.getScore();
 		toServer.writeInt(score[0]);
@@ -229,8 +203,8 @@ public class NewGUI extends Application{
 			Platform.runLater(() -> turnLabel.setText("Not my turn"));
 		System.out.println("sending"+game.getTurn());
 	}
-		/** Receive info from the server */
-	private void receiveInfoFromServer() throws IOException { // Receive game status
+		
+	private void receiveInfoFromServer() throws IOException { 
 		System.out.println("here");
 		int status = fromServer.readInt();
 		System.out.println("Status:"+status);
@@ -241,7 +215,8 @@ public class NewGUI extends Application{
 			else if (player == 0) { 
 				Platform.runLater(() ->lblStatus.setText("Player 1 has won!")); 
 			receiveMove();
-		} }
+			} 
+		}
 		else if (status == 2) { // Player 2 won, stop playing 
 			continueToPlay = false;
 			if (player == 1) {
@@ -249,13 +224,15 @@ public class NewGUI extends Application{
 			else if (player == 0) { 
 				Platform.runLater(() -> lblStatus.setText("Player 2 has won!")); 
 				receiveMove();
-		} }
-			else if (status == 3) { // No winner, game is over 
-				continueToPlay = false; 
-				Platform.runLater(() -> lblStatus.setText("Game is over, no winner!"));
-		if (player == 1) { 
-			receiveMove();
-		} }
+			} 
+		}
+		else if (status == 3) { // No winner, game is over 
+			continueToPlay = false; 
+			Platform.runLater(() -> lblStatus.setText("Game is over, no winner!"));
+			if (player == 1) { 
+				receiveMove();
+			} 
+		}
 		else {
 			receiveMove();
 			if (game.getTurn()!=player)
@@ -263,7 +240,8 @@ public class NewGUI extends Application{
 				Platform.runLater(() -> turnLabel.setText("My turn")); 
 				myTurn = true;
 			}
-		} }
+		}
+	}
 		
 	private void receiveMove() throws IOException { // Get the other player's move
 		System.out.println("received");
@@ -284,6 +262,21 @@ public class NewGUI extends Application{
 		c.updateTable();
 		c.update();
 		System.out.println(player+": "+row+" "+column);
+	}
+	
+	public void setInput(DataInputStream inp)
+	{
+		fromServer = inp;
+	}
+	
+	public void setOutput(DataOutputStream outp)
+	{
+		toServer = outp;
+	}
+	
+	public void setPlayer(int p)
+	{
+		player = p;
 	}
 
 	
@@ -347,7 +340,6 @@ public class NewGUI extends Application{
 				addLabel.setTextFill(Color.web("#FF0000"));
 			addLabel.setFont(new Font("Avenir", 30));
 			Platform.runLater(()->this.getChildren().add(addLabel));
-			//game.checkCombatScore(index,String.valueOf(sOro.getValue()));
 		}
 		
 		public void nextCell(int turn, int[][] index1)

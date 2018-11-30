@@ -27,21 +27,12 @@ public class GUITable {
         endCol = new TableColumn<TableData,Integer>("End");
         score1Col = new TableColumn<TableData,String>("Score1");
         score2Col = new TableColumn<TableData,String>("Score2");
-        startCol.setCellValueFactory(
-        	    new PropertyValueFactory<>("start")
-        	);
-        	score1Col.setCellValueFactory(
-        	    new PropertyValueFactory<>("score1")
-        	);
-        	score2Col.setCellValueFactory(
-            	    new PropertyValueFactory<>("score2")
-            	);
-        	endCol.setCellValueFactory(
-        	    new PropertyValueFactory<>("end")
-        	);
-        	turnCol.setCellValueFactory(
-        	    new PropertyValueFactory<>("turn")
-        	);
+        
+        startCol.setCellValueFactory(new PropertyValueFactory<>("start"));
+        	score1Col.setCellValueFactory(new PropertyValueFactory<>("score1"));
+        	score2Col.setCellValueFactory(new PropertyValueFactory<>("score2"));
+        	endCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+        	turnCol.setCellValueFactory(new PropertyValueFactory<>("turn"));
         	
         	table.getColumns().addAll(turnCol,startCol,endCol,score1Col,score2Col);
 	}

@@ -24,16 +24,15 @@ public class Timer1 {
 	    timeline.setCycleCount(Timeline.INDEFINITE);
 	    timeline.getKeyFrames().add(
 	    		new KeyFrame(Duration.seconds(1),
-	    				event -> {
-						    timeSec++;
-						    Integer error = (int) timeSec/(length*length);
-						    timerLabel.setText(
-						              error.toString());
-						        if(game.endOfMatch())
-						        {
-						        		timeline.stop();
-						        }
-             }));
+	    			event -> {
+	    				timeSec++;
+	    				Integer error = (int) timeSec/(length*length);
+					timerLabel.setText(error.toString());
+						if(game.endOfMatch())
+						{
+							timeline.stop();
+						}
+	    			}));
 	    timeline.playFromStart();
 	}
 	

@@ -10,8 +10,6 @@ import java.net.Socket;
 public class HandleASession implements Runnable{
 	private Socket player1;
 	private Socket player2;
-
-	private char[][] cell = new char[3][3];
 	
 	private DataInputStream fromPlayer1;
 	private DataOutputStream toPlayer1; 
@@ -43,6 +41,30 @@ public class HandleASession implements Runnable{
 			int p1score;
 			int p2score;
 			boolean end ;
+			int mode;
+			int size; 
+			
+			if(Math.random()>0.5)
+			{
+				toPlayer1.writeInt(5);
+				toPlayer2.writeInt(6);
+				mode = fromPlayer1.readInt();
+				size = fromPlayer1.readInt();
+			}
+			else
+			{
+				toPlayer1.writeInt(6);
+				toPlayer2.writeInt(5);
+				mode = fromPlayer2.readInt();
+				size = fromPlayer2.readInt();
+			}
+			
+			System.out.println(mode+" "+size);
+			
+			toPlayer1.writeInt(mode);
+			toPlayer1.writeInt(size);
+			toPlayer2.writeInt(mode);
+			toPlayer2.writeInt(size);
 			
 			while(true)
 			{

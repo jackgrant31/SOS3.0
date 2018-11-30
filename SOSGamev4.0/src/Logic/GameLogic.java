@@ -1,16 +1,10 @@
 package Logic;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.Arrays;
-
 import GUI.Sounds;
-import javafx.application.Platform;
 import javafx.scene.control.Label;
 
-public class GameLogic {
+public abstract class GameLogic {
 	protected int[] score = new int[2];
 	protected int turn, j;
 	public int timeSec=0,lastTimeSec=0;
@@ -22,8 +16,6 @@ public class GameLogic {
 	public GameLogic(int length, String player1, String player2)
 	{
 		 board = new int[length*length];
-		// Players play = new Players(2, player1, player2);
-		 //turn = play.randomStart();
 		 turn=0;
 	}
 	
@@ -110,7 +102,7 @@ public class GameLogic {
 	
 	public void isScore(CheckScore check, int sOro)
 	{
-		Sounds sound = new Sounds();
+		Sounds sound = new Sounds(turn);
 		sound.playSound();	
 	}
 	

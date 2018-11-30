@@ -2,10 +2,11 @@ package GUI;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Date;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -35,6 +36,13 @@ public class SOSServer extends Application{
 			try {
 				ServerSocket serverSocket = new ServerSocket(4969);
 				Platform.runLater(()-> taLog.appendText(new Date() + ": Server started at socket 4969\n"));
+				Platform.runLater(()-> {
+					try {
+						taLog.appendText(new Date() + ": Server IP address is "+InetAddress.getLocalHost()+"\n");
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+				});
 				
 				while(true)
 				{

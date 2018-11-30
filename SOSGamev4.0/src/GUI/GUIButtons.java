@@ -31,7 +31,7 @@ public class GUIButtons {
 			length = Integer.parseInt(String.valueOf(lengthString.charAt(0))+String.valueOf(lengthString.charAt(1)));
 		String player1 = player1entry;
 		String player2 = player2entry;
-		GameGUI game = new GameGUI(length, player1, player2, modenum);
+		NewGUI game = new NewGUI(modenum, length);//length, player1, player2, modenum);
 		try {
 			game.start(window);
 		} catch (Exception e1) {
