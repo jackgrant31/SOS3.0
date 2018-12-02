@@ -39,6 +39,7 @@ public class CheckScore {
 			int[] entry = new int[] {ins, close, far};
 			scoreSpots.add(entry);
 			farList.add(close);
+			farList.add(far);
 		}
 	}
 	

@@ -54,6 +54,10 @@ public class CombatGameLogic extends GameLogic {
 		check.isASScore(ins+2+(2*length),ins+1+length, !((ins+3+(2*length))%length==1||(ins+3+(2*length))%length==2));
 		check.isASScore(ins+2-2*length,ins+1-length, !((ins+3-(2*length))%length==1||(ins+3-(2*length))%length==2));
 		check.isASScore(ins-2+2*length,ins-1+length, !((ins-1+(2*length))%length==0||(ins-1+(2*length))%length==length-1));
+		check.isAOScore(ins-length,ins+length, true);
+		check.isAOScore(ins+1,ins-1, !((ins+2)%length==1 || ins%length==0));
+		check.isAOScore(ins+1-length,ins-1+length, !((ins+2)%length==1 || ins%length==0));
+		check.isAOScore(ins+1+length,ins-1-length, !((ins+2)%length==1 || ins%length==0));
 		
 		ArrayList<int[]> changedSpots = check.getSpots();
 		changedSpots
@@ -70,8 +74,6 @@ public class CombatGameLogic extends GameLogic {
 				});
 		setScore();
 	}
-	
-	
 	
 	public void setScore()
 	{

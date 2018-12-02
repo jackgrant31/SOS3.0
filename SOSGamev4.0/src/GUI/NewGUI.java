@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import Logic.CombatGameLogic;
 import Logic.ExtremeGameLogic;
 import Logic.GameLogic;
@@ -15,6 +14,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -34,7 +34,7 @@ public class NewGUI extends Application{
 	{
 		mode1 =mode;
 		length = size;
-	}
+	}	
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -137,7 +137,6 @@ public class NewGUI extends Application{
 	private String token = " ";
 	private Timer1 time;
 	private boolean myTurn = false;
-	private Label lblTitle = new Label();
 	private Label lblStatus = new Label();
 	private int rowSelected;
 	private int columnSelected;
@@ -148,13 +147,11 @@ public class NewGUI extends Application{
 		
 		new Thread(() -> { 
 			try {
-				//player = fromServer.readInt();
 				if (player == 1) {  
 					Platform.runLater(() -> {
 						playerLabel.setTextFill(Color.web("#0076a3"));
 						turnLabel.setText("Waiting for player 2 to join");
 					});
-					//fromServer.readInt();
 					Platform.runLater(() -> turnLabel.setText("Player 2 has joined. I start first"));
 					myTurn = true; 
 				}
@@ -166,7 +163,6 @@ public class NewGUI extends Application{
 					player=0;
 				}	
 				while (continueToPlay) { 
-					System.out.println(game.getTurn()+" "+player);
 					if (game.getTurn()!=player) {
 						waitForPlayerAction();
 						sendMove();
@@ -190,7 +186,6 @@ public class NewGUI extends Application{
 	}
 		
 	private void sendMove() throws IOException { 
-		System.out.println("Sent");
 		toServer.writeInt(rowSelected); 
 		toServer.writeInt(columnSelected); 
 		toServer.writeChar( sOro.getValue().charAt(0));
@@ -201,13 +196,10 @@ public class NewGUI extends Application{
 		toServer.writeInt(game.getTurn());
 		if (game.getTurn()==player)
 			Platform.runLater(() -> turnLabel.setText("Not my turn"));
-		System.out.println("sending"+game.getTurn());
 	}
 		
 	private void receiveInfoFromServer() throws IOException { 
-		System.out.println("here");
 		int status = fromServer.readInt();
-		System.out.println("Status:"+status);
 		if (status == 1) {
 			continueToPlay = false;
 			if (player == 1) {
@@ -217,7 +209,7 @@ public class NewGUI extends Application{
 			receiveMove();
 			} 
 		}
-		else if (status == 2) { // Player 2 won, stop playing 
+		else if (status == 2) { 
 			continueToPlay = false;
 			if (player == 1) {
 				Platform.runLater(() -> lblStatus.setText("I won! ")); }
@@ -226,7 +218,7 @@ public class NewGUI extends Application{
 				receiveMove();
 			} 
 		}
-		else if (status == 3) { // No winner, game is over 
+		else if (status == 3) { 
 			continueToPlay = false; 
 			Platform.runLater(() -> lblStatus.setText("Game is over, no winner!"));
 			if (player == 1) { 
@@ -243,25 +235,22 @@ public class NewGUI extends Application{
 		}
 	}
 		
-	private void receiveMove() throws IOException { // Get the other player's move
-		System.out.println("received");
+	private void receiveMove() throws IOException { 
 		int row = fromServer.readInt();
 		int column = fromServer.readInt();
 		String so = Character.toString(fromServer.readChar());
-		int p1 = fromServer.readInt();
-		int p2 = fromServer.readInt();
-		boolean end = fromServer.readBoolean();
-		int turn = fromServer.readInt();
+		fromServer.readInt();
+		fromServer.readInt();
+		fromServer.readBoolean();
+		fromServer.readInt();
 		Cell c = cell[row][column];
 		int index =  row * length + column;
-		System.out.println(so + " "+ index);
 		c.setLabel(so,index);
 		c.addToBoard(row+1,column+1,so);
 		c.setLabels(); 
 		c.gameOver();
 		c.updateTable();
 		c.update();
-		System.out.println(player+": "+row+" "+column);
 	}
 	
 	public void setInput(DataInputStream inp)
@@ -308,16 +297,13 @@ public class NewGUI extends Application{
 		}
 		
 		private void handleMouseClick() {
-			System.out.println(token + myTurn);
 			if (myTurn) 
 			{
-				System.out.println(player+" clicked");
 				int yIndex = (int) Math.round(this.getLayoutY()*length/600);
 				int xIndex = (int) Math.round(this.getLayoutX()*length/800);
 				int index =  xIndex * length + yIndex;
 				rowSelected = row;
 				columnSelected = column;
-				lblStatus.setText("waiting");
 				waiting=false;
 				setLabel((String) sOro.getValue(),index);
 				addToBoard(xIndex+1,yIndex+1,(String) sOro.getValue());

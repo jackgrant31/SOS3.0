@@ -90,24 +90,29 @@ public class InitGUI extends Application {
 		
 		endButton.setOnAction(e -> {
 			try {
-				int modenum;
-				if (modeCombo.getValue().equals("Normal"))
-					modenum=0;
-				else if(modeCombo.getValue().equals("Extreme"))
-					modenum=1;
-				else
-					modenum=2;
-				int length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0)));
-				if(length==1)
-					length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0))+String.valueOf(gridCombo.getValue().charAt(1)));
-				toServer.writeInt(modenum);
-				toServer.writeInt(length);
-				window.close();
+				handleButtonClick(window, gridCombo, modeCombo);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		});
 		window.show();
+	}
+
+	private void handleButtonClick(Stage window, ComboBox<String> gridCombo, ComboBox<String> modeCombo)
+			throws IOException {
+		int modenum;
+		if (modeCombo.getValue().equals("Normal"))
+			modenum=0;
+		else if(modeCombo.getValue().equals("Extreme"))
+			modenum=1;
+		else
+			modenum=2;
+		int length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0)));
+		if(length==1)
+			length = Integer.parseInt(String.valueOf(gridCombo.getValue().charAt(0))+String.valueOf(gridCombo.getValue().charAt(1)));
+		toServer.writeInt(modenum);
+		toServer.writeInt(length);
+		window.close();
 	}
 
 	public void setOutput(DataOutputStream toServer2) {

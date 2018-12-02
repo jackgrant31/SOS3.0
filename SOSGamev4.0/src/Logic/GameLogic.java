@@ -88,13 +88,10 @@ public abstract class GameLogic {
 		}
 		if(check.getScore()>0)
 		{
-			System.out.println(turn);
 			if(j==0)
 				turn-=1;
 			j++;
-			System.out.println(turn);
 			setScore(check);
-			//check.setLast();
 			isScore(check, board[ins]);	
 		}
 		return check.getRoundMoves();
