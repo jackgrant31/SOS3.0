@@ -155,7 +155,7 @@ public class NewGUI extends Application{
 					Platform.runLater(() -> turnLabel.setText("Player 2 has joined. I start first"));
 					myTurn = true; 
 				}
-				else if (player == 2) { 
+				else  { 
 					Platform.runLater(() -> {
 						playerLabel.setTextFill(Color.web("#FF0000"));
 						turnLabel.setText("Waiting for player 1 to move"); 
@@ -190,8 +190,8 @@ public class NewGUI extends Application{
 		toServer.writeInt(columnSelected); 
 		toServer.writeChar( sOro.getValue().charAt(0));
 		int[] score = game.getScore();
-		toServer.writeInt(score[0]);
 		toServer.writeInt(score[1]);
+		toServer.writeInt(score[0]);
 		toServer.writeBoolean(!continueToPlay);
 		toServer.writeInt(game.getTurn());
 		if (game.getTurn()==player)
@@ -203,24 +203,24 @@ public class NewGUI extends Application{
 		if (status == 1) {
 			continueToPlay = false;
 			if (player == 1) {
-				Platform.runLater(() -> lblStatus.setText("I won!")); }
+				Platform.runLater(() -> turnLabel.setText("I won!")); }
 			else if (player == 0) { 
-				Platform.runLater(() ->lblStatus.setText("Player 1 has won!")); 
+				Platform.runLater(() ->turnLabel.setText("Player 1 has won!")); 
 			receiveMove();
 			} 
 		}
 		else if (status == 2) { 
 			continueToPlay = false;
 			if (player == 1) {
-				Platform.runLater(() -> lblStatus.setText("I won! ")); }
+				Platform.runLater(() -> turnLabel.setText("I won! ")); }
 			else if (player == 0) { 
-				Platform.runLater(() -> lblStatus.setText("Player 2 has won!")); 
+				Platform.runLater(() -> turnLabel.setText("Player 2 has won!")); 
 				receiveMove();
 			} 
 		}
 		else if (status == 3) { 
 			continueToPlay = false; 
-			Platform.runLater(() -> lblStatus.setText("Game is over, no winner!"));
+			Platform.runLater(() -> turnLabel.setText("Game is over, no winner!"));
 			if (player == 1) { 
 				receiveMove();
 			} 
@@ -350,16 +350,13 @@ public class NewGUI extends Application{
 		private void setLabels()
 		{
 			int[] score = game.getScore();
-			Platform.runLater(()->playerLabel.setText(" Player1 points: "+score[0]+"  Player2 points: "+score[1]));
+			Platform.runLater(()->playerLabel.setText(" Player1 points: "+score[1]+"  Player2 points: "+score[0]));
 		}
 		
 		private void gameOver()
 		{
 			if (game.endOfMatch()==true) 	
-			{
-	    	  		turnLabel.setText(" "+game.whoWon(player1, player2) + " won with "+game.whoHadMorePoints()+" points! The game is over.");
-	    	  		continueToPlay = false;
-			}
+				continueToPlay = false;
 		}
 		
 		private void addToBoard(int yIndex, int xIndex, String so)
@@ -377,7 +374,7 @@ public class NewGUI extends Application{
 			else
 				name="Player2";
 			int[] score = game.getScore();
-			gtable.setList(time.lastTime(), time.getTime(), "Player1: "+score[0],"Player2: "+score[1], name);
+			gtable.setList(time.lastTime(), time.getTime(), "Player1: "+score[1],"Player2: "+score[0], name);
 		}
 		
 		public void update()

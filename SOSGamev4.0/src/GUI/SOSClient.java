@@ -105,6 +105,7 @@ public class SOSClient extends Application{
 
 	private void assignPlayers() throws IOException {
 		player = fromServer.readInt();
+		player = 2;
 		if (player == 1) {  
 			Platform.runLater(() -> {
 				taLog.appendText("I am player 1.\nWaiting for player 2 to join\n");

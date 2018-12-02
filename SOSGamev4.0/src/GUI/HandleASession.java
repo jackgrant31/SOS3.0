@@ -69,16 +69,16 @@ public class HandleASession implements Runnable{
 			p2score = fromStream.readInt();
 			end = fromStream.readBoolean();
 			turn = fromStream.readInt();
-			System.out.println("got it"+turn);
+			System.out.println(end);
 			
 			if (end == true) { 
-				if (p1score>p2score)
+				if (p1score<p2score)
 				{
 					writeOne();
 					sendMove(toStream, row, column, p1score, p2score, so, false, turn);
 					endLoop= false;
 				}
-				else if(p2score>p1score)
+				else if(p2score<p1score)
 				{
 					writeTwo();
 					sendMove(toStream, row, column, p1score, p2score, so, false, turn);
